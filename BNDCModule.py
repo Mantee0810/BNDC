@@ -8,9 +8,6 @@ import ptflops
 
 from torch.nn import BatchNorm2d
 
-input1 = torch.randn(size=(2,128,64,32))
-input2 = torch.randn(size=(2,128,32,16))
-
 class ConvBNReLU(nn.Module):
 
     def __init__(self, channel, ks=(3,3), stride=(1,1), padding=(1,1), *args, **kwargs):
@@ -88,7 +85,7 @@ class Inter_channel(nn.Module):
 
         return x*num.expand_as(x)
 
-class Inside_channel(nn.Module):
+class Intra_channel(nn.Module):
     def __init__(self, channels, dimension=2, sub_sample=False, bn_layer=True):
         """
         :param in_channels:
@@ -98,7 +95,7 @@ class Inside_channel(nn.Module):
         :param bn_layer:
         """
 
-        super(Inside_channel, self).__init__()
+        super(Intra_channel, self).__init__()
 
         assert dimension in [1, 2, 3]
 
@@ -177,9 +174,11 @@ class Inside_channel(nn.Module):
 
 
 if __name__ == "__main__":
-
+    input1 = torch.randn(size=(2,128,64,32))
+    input2 = torch.randn(size=(2,128,32,16))
+    
     ic = Inter_channel(128,64,32)
-    nl = Inside_channel(128)
+    nl = Intra_channel(128)
     output1 = ic(input1)
     output2 = nl(input1)
     print(output2.shape)
