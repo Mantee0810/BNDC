@@ -57,7 +57,8 @@ class Inter_channel(nn.Module):
             stride2 = stride
         elif int(w/h) == 2:
             stride1 = (1,2)
-            stride2 = stride
+            stride2  =stride
+
 
         # 调整这两个stride可以影响输入输出大小
         if self.conv1 is None:
@@ -183,12 +184,21 @@ class Intra_channel(nn.Module):
             return z, f_div_C
         return z
 
+class BNDC(nn.Module):
+    def __init__(self,channel):
+        super(BNDC, self).__init__()
+        self.inter_channel = Inter_channel(channel)
+        self.intra_channel = Intra_channel(channel)
+
+    def forward(self,x):
+        x1 = self.inter_channel(x)
+        x2 = self.intra_channel(x)
+        x = x1 + x2
+        return x
+
 
 if __name__ == "__main__":
-    input1 = torch.randn(size=(2, 128, 16,16))
-
-    ic = Inter_channel(128)
-    nl = Intra_channel(128)
-    output1 = ic(input1)
-    output2 = nl(input1)
-    print(output1.shape,output2.shape)
+    input1 = torch.randn(size=(2, 128, 32, 16))
+    bndc = BNDC(128)
+    output1 = bndc(input1)
+    print(output1.shape)
