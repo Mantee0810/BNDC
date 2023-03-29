@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 import numpy as np
@@ -8,17 +7,17 @@ import ptflops
 
 from torch.nn import BatchNorm2d
 
-class ConvBNReLU(nn.Module):
 
-    def __init__(self, channel, ks=(3,3), stride=(1,1), padding=(1,1), *args, **kwargs):
+class ConvBNReLU(nn.Module):
+    def __init__(self, channel, ks=(3, 3), stride=(1, 1), padding=(1, 1), *args, **kwargs):
         super(ConvBNReLU, self).__init__()
         self.conv = nn.Conv2d(channel,
-                channel,
-                kernel_size = ks,
-                stride = stride,
-                padding = padding,
-                bias = False,
-                groups=channel)
+                              channel,
+                              kernel_size=ks,
+                              stride=stride,
+                              padding=padding,
+                              bias=False,
+                              groups=channel)
         self.bn = BatchNorm2d(channel)
         self.relu = nn.ReLU(inplace=True)
         self.init_weight()
@@ -35,19 +34,38 @@ class ConvBNReLU(nn.Module):
                 nn.init.kaiming_normal_(ly.weight, a=1)
                 if not ly.bias is None: nn.init.constant_(ly.bias, 0)
 
+
 class Inter_channel(nn.Module):
 
-    def __init__(self,channel,h,w):
+    def __init__(self, channel):
         super(Inter_channel, self).__init__()
         self.channel = channel
-        self.conv1 = ConvBNReLU(channel,ks=(h,1),stride=(1,1),padding=(0,0))
-        self.conv2 = ConvBNReLU(channel,ks=(1,w),stride=(2,1),padding=(0,0))
-        self.linear1 = nn.Linear(channel, 2*channel)
-        self.linear2 = nn.Linear(2*channel, channel)
+        self.conv1 = None
+        self.conv2 = None
+        self.linear1 = nn.Linear(channel, 2 * channel)
+        self.linear2 = nn.Linear(2 * channel, channel)
         self.sm = nn.Softmax(dim=1)
 
-    def forward(self,x):
-        b,c,_,_ = x.shape
+    def forward(self, x):
+        b, c, h, w = x.shape
+        stride = (1,1)
+        if int(h/w) == 2:
+            stride1 = stride
+            stride2 = (2,1)
+        elif int(h/w) == 1:
+            stride1 = stride
+            stride2 = stride
+        elif int(w/h) == 2:
+            stride1 = (1,2)
+            stride2  =stride
+
+
+        # 调整这两个stride可以影响输入输出大小
+        if self.conv1 is None:
+            self.conv1 = ConvBNReLU(self.channel, ks=(h, 1), stride=stride1, padding=(0, 0))
+        if self.conv2 is None:
+            self.conv2 = ConvBNReLU(self.channel, ks=(1, w), stride=stride2, padding=(0, 0))
+
         xl1 = self.conv1(x)
         xl2 = self.conv2(x)
 
@@ -66,34 +84,28 @@ class Inter_channel(nn.Module):
             for k in range(b):
                 cul1 = dot1[k, :, :]
                 cul2 = dot2[k, :, :]
-                ans.append(torch.mm(cul1,cul2))
+                ans.append(torch.mm(cul1, cul2))
             # ans pinjie
-            if b==1:
+            if b == 1:
                 ans = ans[0]
             else:
-                for l in range(1,len(ans)):
-                    ans = torch.cat((ans[0],ans[l]))
+                for l in range(1, len(ans)):
+                    ans = torch.cat((ans[0], ans[l]))
             num.append(ans)
 
         # num to tensor
-        num = torch.stack(num,dim=0)
-        num = num.view(b,c)
+        num = torch.stack(num, dim=0)
+        num = num.view(b, c)
         num = self.linear1(num)
         num = self.linear2(num)
         num = self.sm(num)
         num = num.view(b, c, 1, 1)
 
-        return x*num.expand_as(x)
+        return x * num.expand_as(x)
+
 
 class Intra_channel(nn.Module):
     def __init__(self, channels, dimension=2, sub_sample=False, bn_layer=True):
-        """
-        :param in_channels:
-        :param inter_channels:
-        :param dimension:
-        :param sub_sample:
-        :param bn_layer:
-        """
 
         super(Intra_channel, self).__init__()
 
@@ -119,26 +131,26 @@ class Intra_channel(nn.Module):
             bn = nn.BatchNorm1d
 
         self.g = conv_nd(in_channels=self.in_channels, out_channels=self.inter_channels,
-                         kernel_size=1, stride=1, padding=0,groups=self.in_channels)
+                         kernel_size=1, stride=1, padding=0, groups=self.in_channels)
 
         if bn_layer:
             self.W = nn.Sequential(
                 conv_nd(in_channels=self.inter_channels, out_channels=self.in_channels,
-                        kernel_size=1, stride=1, padding=0,groups=self.in_channels),
+                        kernel_size=1, stride=1, padding=0, groups=self.in_channels),
                 bn(self.in_channels)
             )
             nn.init.constant_(self.W[1].weight, 0)
             nn.init.constant_(self.W[1].bias, 0)
         else:
             self.W = conv_nd(in_channels=self.inter_channels, out_channels=self.in_channels,
-                             kernel_size=1, stride=1, padding=0,groups=self.in_channels)
+                             kernel_size=1, stride=1, padding=0, groups=self.in_channels)
             nn.init.constant_(self.W.weight, 0)
             nn.init.constant_(self.W.bias, 0)
 
         self.theta = conv_nd(in_channels=self.in_channels, out_channels=self.inter_channels,
-                             kernel_size=1, stride=1, padding=0,groups=self.in_channels)
+                             kernel_size=1, stride=1, padding=0, groups=self.in_channels)
         self.phi = conv_nd(in_channels=self.in_channels, out_channels=self.inter_channels,
-                           kernel_size=1, stride=1, padding=0,groups=self.in_channels)
+                           kernel_size=1, stride=1, padding=0, groups=self.in_channels)
 
         if sub_sample:
             self.g = nn.Sequential(self.g, max_pool_layer)
@@ -174,11 +186,10 @@ class Intra_channel(nn.Module):
 
 
 if __name__ == "__main__":
-    input1 = torch.randn(size=(2,128,64,32))
-    input2 = torch.randn(size=(2,128,32,16))
-    
-    ic = Inter_channel(128,64,32)
+    input1 = torch.randn(size=(2, 128, 16,16))
+
+    ic = Inter_channel(128)
     nl = Intra_channel(128)
     output1 = ic(input1)
     output2 = nl(input1)
-    print(output2.shape)
+    print(output1.shape,output2.shape)
