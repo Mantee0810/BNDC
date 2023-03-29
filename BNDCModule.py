@@ -57,8 +57,7 @@ class Inter_channel(nn.Module):
             stride2 = stride
         elif int(w/h) == 2:
             stride1 = (1,2)
-            stride2  =stride
-
+            stride2 = stride
 
         # 调整这两个stride可以影响输入输出大小
         if self.conv1 is None:
