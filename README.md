@@ -7,4 +7,4 @@
 * 在forward函数中，加入`map = self.bndc(map)`
 **就大功告成啦**
 
-下面是fine-tune时间，请自由发挥！
+
