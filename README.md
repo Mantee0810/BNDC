@@ -1,10 +1,41 @@
-# BNDC
-这是一个**即插即用**的模块，自适应不同大小的输入
-## 用法
-在模型的类定义中，按以下方式处理：
-* from BNDCModule.py import BNDC
-* 在__init__函数中，加入`self.bndc = BNDC(c)`——其中c是此处特征图的通道数
-* 在forward函数中，加入`map = self.bndc(map)`
-**就大功告成啦**
+# BNDCNet: Bilateral Nonlocal Decoupled Convergence Network for Semantic Segmentation
+
+### Module Introduction
+BNDC is a **end-to-end** module that is able to adapt itself to different sized inputs. 
+Given an input feature map, the output feature map has the same shape and size.
+
+This can be checked with the following code：
+  ```
+  print(feature_map.shape)
+  ```
+
+### Direct Use Methods
+
+1. Place file **BNDCModule.py** in the same folder as the model.py.
+
+2. In the model file, **import** the module as follows:
+  ```
+  from BNDCModule.py import BNDC
+  ```
+
+3. In the **__init__** function of the model, define it as follows:
+  ```
+  self.bndc = BNDC(channel)
+  ```
+  where channel is the number of **channels of the feature map**
+
+4. In the **forward** function, do the forward propagation as follows:
+  ```
+  map = self.bndc(map)
+  ```
+
+### Full Usage
+
+The **models folder** gives the complete structure:
+  ```BiseNet.py``` is the structural implementation of BiseNet
+  ```BNDCModule.py``` is the structural implementation of BNDC
+  Insert the modules in the same way as the **Direct Use Methods**.
+
+
 
 
