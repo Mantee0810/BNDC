@@ -39,6 +39,18 @@ The **models folder** gives the complete structure:
   
 &ensp;&ensp;Insert the modules in the same way as the **Direct Use Methods**.
 
+### Treatment of special shape tensor
+
+In the source code, we give the forward approach for **three cases** (line52 - line60)
+
+* Feature map with ```height:width=1:1```
+* Feature map with ```height:width=2:1```
+* Feature map with ```height:width=1:2```
+
+If your feature map has a more specialized shape, consider setting the step size of the **Inter_channel** module differently (refer to **line52 - line60**).
+
+
+
 
 
 
