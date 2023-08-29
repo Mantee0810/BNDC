@@ -7,8 +7,8 @@ The **module structure** is shown below:
 ![](full_module1.png)
 
 The structure of the two mini-modules inter-channel and intra-channel is shown below:
-![](inter_channel.png)
-![](intra_channel.png)
+
+<img src="inter_channel.png" alt="" width="600" height=auto>&ensp;&ensp;&ensp;&ensp;<img src="intra_channel.png" alt="" width="300" height=auto>
 
 Given an input feature map, the output feature map has the same shape and size.
 
