@@ -59,7 +59,6 @@ class Inter_channel(nn.Module):
             stride1 = (1,2)
             stride2 = stride
 
-        # 调整这两个stride可以影响输入输出大小
         if self.conv1 is None:
             self.conv1 = ConvBNReLU(self.channel, ks=(h, 1), stride=stride1, padding=(0, 0))
         if self.conv2 is None:
@@ -197,7 +196,7 @@ class BNDC(nn.Module):
 
 
 if __name__ == "__main__":
-    input1 = torch.randn(size=(2, 128, 32, 16))
-    bndc = BNDC(128)
+    input1 = torch.randn(size=(2, 64, 32, 16))
+    bndc = BNDC(64)
     output1 = bndc(input1)
     print(output1.shape)
