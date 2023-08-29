@@ -58,8 +58,7 @@ class Inter_channel(nn.Module):
         elif int(w/h) == 2:
             stride1 = (1,2)
             stride2 = stride
-
-        # 调整这两个stride可以影响输入输出大小
+            
         if self.conv1 is None:
             self.conv1 = ConvBNReLU(self.channel, ks=(h, 1), stride=stride1, padding=(0, 0))
         if self.conv2 is None:
