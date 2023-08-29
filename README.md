@@ -2,6 +2,14 @@
 
 ### Module Introduction
 BNDC is a **end-to-end** module that is able to adapt itself to different sized inputs. 
+
+The **module structure** is shown below:
+![](full_module1.png)
+
+The structure of the two mini-modules inter-channel and intra-channel is shown below:
+![](inter-channel.png)
+![](intra-channel.png)
+
 Given an input feature map, the output feature map has the same shape and size.
 
 This can be checked with the following code：
@@ -48,6 +56,7 @@ In the source code, we give the forward approach for **three cases** (line52 - l
 * Feature map with ```height:width=1:2```
 
 If your feature map has a more specialized shape, consider setting the step size of the **Inter_channel** module differently (refer to **line52 - line60**).
+
 
 
 
