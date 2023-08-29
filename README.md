@@ -22,7 +22,7 @@ This can be checked with the following code：
   ```
   self.bndc = BNDC(channel)
   ```
-  where channel is the number of **channels of the feature map**
+&ensp;&ensp;where channel is the number of **channels of the feature map**
 
 4. In the **forward** function, do the forward propagation as follows:
   ```
