@@ -32,9 +32,12 @@ This can be checked with the following code：
 ### Full Usage
 
 The **models folder** gives the complete structure:
-  ```BiseNet.py``` is the structural implementation of BiseNet
-  ```BNDCModule.py``` is the structural implementation of BNDC
-  Insert the modules in the same way as the **Direct Use Methods**.
+
+&ensp;&ensp;```BiseNet.py``` is the structural implementation of BiseNet
+  
+&ensp;&ensp;```BNDCModule.py``` is the structural implementation of BNDC
+  
+&ensp;&ensp;Insert the modules in the same way as the **Direct Use Methods**.
 
 
 
